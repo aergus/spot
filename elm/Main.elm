@@ -11,36 +11,10 @@ import Signal
 import Time
 
 import Auxiliary (..)
+import Drawing (..)
 import Parameters (..)
 import Transitions (..)
 import Types (..)
-
-colorOf : Block -> Color.Color
-colorOf l = if List.isEmpty l
-            then blockBg
-            else let n = List.length l - 1
-                 --in elemAt [Color.blue, Color.yellow, Color.red, Color.green, Color.brown, Color.orange] n
-                 --in Color.rgb (150 - 10 * n) (100 - 5 * n) (250 - 15 * n)
-                 in Color.rgb ((211 * n) % 255) ((223 * n) % 255) ((227 * n) % 255)
-
-
-toForms : GameField -> List Graphics.Collage.Form
-toForms f = let toOffset k = -sceneSize / 2 + blockSize / 2 + marginSize +
-                             (blockSize + marginSize) * toFloat k in
-  List.concat (indexedMatrixMap
-    (\ (i, j) x -> Graphics.Collage.move (toOffset j, -(toOffset i))
-                                         (Graphics.Collage.filled (colorOf x)
-                                                                  (Graphics.Collage.rect blockSize blockSize))
-    )
-    f)
-
-toScene : GameField -> Graphics.Element.Element
-toScene f = let size = round sceneSize in
-  Graphics.Collage.collage size
-                           size
-                           ([Graphics.Collage.filled bg (Graphics.Collage.rect sceneSize sceneSize)] ++
-                             (toForms << emptyField) dimension ++
-                             (toForms f))
 
 main : Signal.Signal Graphics.Element.Element
 main = Signal.map (toScene << fst)
@@ -58,10 +32,10 @@ main = Signal.map (toScene << fst)
                                                                    then Just Right
                                                                    else Nothing)
                                              Keyboard.arrows)))
-             
+
+
 score : GameField -> Int
 score f = List.sum (List.map (\ x -> if List.isEmpty x then 0 else 2 ^ (List.length x - 1)) (List.concat f))
-
 
 moves : GameField -> Moves
 moves f = {up = move Up f, down = move Down f, left = move Left f, right = move Right f}
