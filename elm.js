@@ -690,6 +690,90 @@ Elm.Color.make = function (_elm) {
                        ,darkCharcoal: darkCharcoal};
    return _elm.Color.values;
 };
+Elm.Drawing = Elm.Drawing || {};
+Elm.Drawing.make = function (_elm) {
+   "use strict";
+   _elm.Drawing = _elm.Drawing || {};
+   if (_elm.Drawing.values)
+   return _elm.Drawing.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "Drawing",
+   $Auxiliary = Elm.Auxiliary.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Parameters = Elm.Parameters.make(_elm),
+   $Types = Elm.Types.make(_elm);
+   var colorOf = function (l) {
+      return $List.isEmpty(l) ? $Parameters.blockBg : function () {
+         var n = $List.length(l) - 1;
+         return A3($Color.rgb,
+         A2($Basics._op["%"],
+         211 * n,
+         255),
+         A2($Basics._op["%"],
+         223 * n,
+         255),
+         50);
+      }();
+   };
+   var toForms = function (f) {
+      return function () {
+         var toOffset = function (k) {
+            return (0 - $Parameters.sceneSize) / 2 + $Parameters.blockSize / 2 + $Parameters.marginSize + ($Parameters.blockSize + $Parameters.marginSize) * $Basics.toFloat(k);
+         };
+         return $List.concat(A2($Auxiliary.indexedMatrixMap,
+         F2(function (_v0,x) {
+            return function () {
+               switch (_v0.ctor)
+               {case "_Tuple2":
+                  return A2($Graphics$Collage.move,
+                    {ctor: "_Tuple2"
+                    ,_0: toOffset(_v0._1)
+                    ,_1: 0 - toOffset(_v0._0)},
+                    A2($Graphics$Collage.filled,
+                    colorOf(x),
+                    A2($Graphics$Collage.rect,
+                    $Parameters.blockSize,
+                    $Parameters.blockSize)));}
+               _U.badCase($moduleName,
+               "between lines 23 and 25");
+            }();
+         }),
+         f));
+      }();
+   };
+   var toScene = function (f) {
+      return function () {
+         var size = $Basics.round($Parameters.sceneSize);
+         return A3($Graphics$Collage.collage,
+         size,
+         size,
+         A2($Basics._op["++"],
+         _L.fromArray([A2($Graphics$Collage.filled,
+         $Parameters.bg,
+         A2($Graphics$Collage.rect,
+         $Parameters.sceneSize,
+         $Parameters.sceneSize))]),
+         A2($Basics._op["++"],
+         function ($) {
+            return toForms($Parameters.emptyField($));
+         }($Parameters.dimension),
+         toForms(f))));
+      }();
+   };
+   _elm.Drawing.values = {_op: _op
+                         ,colorOf: colorOf
+                         ,toForms: toForms
+                         ,toScene: toScene};
+   return _elm.Drawing.values;
+};
 Elm.Graphics = Elm.Graphics || {};
 Elm.Graphics.Collage = Elm.Graphics.Collage || {};
 Elm.Graphics.Collage.make = function (_elm) {
@@ -1881,10 +1965,8 @@ Elm.Main.make = function (_elm) {
    _L = _N.List.make(_elm),
    _P = _N.Ports.make(_elm),
    $moduleName = "Main",
-   $Auxiliary = Elm.Auxiliary.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Color = Elm.Color.make(_elm),
-   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $Drawing = Elm.Drawing.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $Keyboard = Elm.Keyboard.make(_elm),
    $List = Elm.List.make(_elm),
@@ -1918,93 +2000,33 @@ Elm.Main.make = function (_elm) {
       },
       $List.concat(f)));
    };
-   var colorOf = function (l) {
-      return $List.isEmpty(l) ? $Parameters.blockBg : function () {
-         var n = $List.length(l) - 1;
-         return A3($Color.rgb,
-         A2($Basics._op["%"],
-         211 * n,
-         255),
-         A2($Basics._op["%"],
-         223 * n,
-         255),
-         A2($Basics._op["%"],
-         227 * n,
-         255));
-      }();
-   };
-   var toForms = function (f) {
-      return function () {
-         var toOffset = function (k) {
-            return (0 - $Parameters.sceneSize) / 2 + $Parameters.blockSize / 2 + $Parameters.marginSize + ($Parameters.blockSize + $Parameters.marginSize) * $Basics.toFloat(k);
-         };
-         return $List.concat(A2($Auxiliary.indexedMatrixMap,
-         F2(function (_v0,x) {
-            return function () {
-               switch (_v0.ctor)
-               {case "_Tuple2":
-                  return A2($Graphics$Collage.move,
-                    {ctor: "_Tuple2"
-                    ,_0: toOffset(_v0._1)
-                    ,_1: 0 - toOffset(_v0._0)},
-                    A2($Graphics$Collage.filled,
-                    colorOf(x),
-                    A2($Graphics$Collage.rect,
-                    $Parameters.blockSize,
-                    $Parameters.blockSize)));}
-               _U.badCase($moduleName,
-               "between lines 31 and 33");
-            }();
-         }),
-         f));
-      }();
-   };
-   var toScene = function (f) {
-      return function () {
-         var size = $Basics.round($Parameters.sceneSize);
-         return A3($Graphics$Collage.collage,
-         size,
-         size,
-         A2($Basics._op["++"],
-         _L.fromArray([A2($Graphics$Collage.filled,
-         $Parameters.bg,
-         A2($Graphics$Collage.rect,
-         $Parameters.sceneSize,
-         $Parameters.sceneSize))]),
-         A2($Basics._op["++"],
-         function ($) {
-            return toForms($Parameters.emptyField($));
-         }($Parameters.dimension),
-         toForms(f))));
-      }();
-   };
    var main = A2($Signal.map,
    function ($) {
-      return toScene($Basics.fst($));
+      return $Drawing.toScene($Basics.fst($));
    },
    A3($Signal.foldp,
-   F2(function (_v4,_v5) {
+   F2(function (_v0,_v1) {
       return function () {
-         switch (_v5.ctor)
+         switch (_v1.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v4.ctor)
+                 switch (_v0.ctor)
                  {case "_Tuple2":
                     return function () {
                          var seed = A2($Maybe.withDefault,
                          function ($) {
                             return $Random.initialSeed($Basics.round($Time.inSeconds($)));
-                         }(_v4._0),
-                         _v5._1);
+                         }(_v0._0),
+                         _v1._1);
                          return A2($Maybe.withDefault,
                          {ctor: "_Tuple2"
-                         ,_0: _v5._0
-                         ,_1: _v5._1},
+                         ,_0: _v1._0
+                         ,_1: _v1._1},
                          A2($Maybe.map,
                          function (d) {
                             return function () {
                                var $ = A2($Transitions.addRandomBlock,
-                               A2($Transitions.move,d,_v5._0),
+                               A2($Transitions.move,d,_v1._0),
                                seed),
                                f$ = $._0,
                                newSeed = $._1;
@@ -2013,13 +2035,13 @@ Elm.Main.make = function (_elm) {
                                       ,_1: $Maybe.Just(newSeed)};
                             }();
                          },
-                         _v4._1));
+                         _v0._1));
                       }();}
                  _U.badCase($moduleName,
-                 "between lines 47 and 49");
+                 "between lines 21 and 23");
               }();}
          _U.badCase($moduleName,
-         "between lines 47 and 49");
+         "between lines 21 and 23");
       }();
    }),
    {ctor: "_Tuple2"
@@ -2043,9 +2065,6 @@ Elm.Main.make = function (_elm) {
    },
    $Keyboard.arrows))));
    _elm.Main.values = {_op: _op
-                      ,colorOf: colorOf
-                      ,toForms: toForms
-                      ,toScene: toScene
                       ,main: main
                       ,score: score
                       ,moves: moves};
