@@ -1,5 +1,6 @@
 module Transitions where
 
+import Dict
 import List
 import Random
 
@@ -9,14 +10,14 @@ import Types (..)
 
 addRandomBlock : GameField -> Random.Seed -> (GameField, Random.Seed)
 addRandomBlock f s =
-  let frees = (List.concat << List.concat) (indexedMatrixMap (\ p x -> if List.isEmpty x then [p] else []) f)
+  let frees = (List.concat << Dict.values) (Dict.map (\ p x -> if List.isEmpty x then [p] else []) f)
       l = List.length frees
   in if l == 0
      then (f, s)
      else let (i, s') = Random.generate (Random.int 0 (l - 1)) s
-          in (indexedMatrixMap (\ p x -> if p == elemAt frees i
-                                         then [p]
-                                         else x) f,
+          in (Dict.map (\ p x -> if p == elemAt frees i
+                                 then [p]
+                                 else x) f,
               s')
 
 getVars : Direction -> Position -> (Position, Int, Int)
@@ -33,14 +34,14 @@ shift d f = let f' = shiftOnce d f in if f' == f then f' else shift d f'
 atToWhole : (Direction -> Position -> GameField -> GameField) -> Direction -> GameField -> GameField
 atToWhole fct d f =  List.foldr (if d == Down || d == Right then (<<) else (>>))
                                 identity
-                                (List.map (fct d) (List.concat (indexedMatrixMap (\ p x -> p) f)))
+                                (List.map (fct d) (Dict.keys f))
                                 f
 
 shiftOnce : Direction -> GameField -> GameField
 shiftOnce = atToWhole shiftOnceAt
 
 shiftOnceAt : Direction -> Position -> GameField -> GameField
-shiftOnceAt d q f = let (q', coord, bound) = getVars d q in indexedMatrixMap
+shiftOnceAt d q f = let (q', coord, bound) = getVars d q in Dict.map
   (if coord /= bound && List.isEmpty (entryAt f q')
    then \ p x -> if p == q'
                  then entryAt f q
@@ -56,7 +57,7 @@ merge = atToWhole mergeOnceAt
 mergeOnceAt : Direction -> Position -> GameField -> GameField
 mergeOnceAt d q f = let (q', coord, bound) = getVars d q
                         entry = (entryAt f q)
-                    in indexedMatrixMap
+                    in Dict.map
   (if coord /= bound && (not << List.isEmpty) entry && List.length (entryAt f q') == List.length entry
    then \ p x -> if p == q'
                  then entry ++ x

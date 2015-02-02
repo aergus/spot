@@ -1,10 +1,12 @@
 module Types where
 
+import Dict
+
 type alias Position = (Int, Int)
 
 type alias Block = List Position
 
-type alias GameField = List (List Block)
+type alias GameField = Dict.Dict Position Block
 
 type alias Moves = {up : GameField,
                     down : GameField,

@@ -1,6 +1,7 @@
 module Drawing where
 
 import Color
+import Dict
 import Graphics.Element
 import Graphics.Collage
 import List
@@ -19,7 +20,7 @@ colorOf l = if List.isEmpty l
 toForms : GameField -> List Graphics.Collage.Form
 toForms f = let toOffset k = -sceneSize / 2 + blockSize / 2 + marginSize +
                              (blockSize + marginSize) * toFloat k in
-  List.concat (indexedMatrixMap
+  Dict.values (Dict.map
     (\ (i, j) x -> Graphics.Collage.move (toOffset j, -(toOffset i))
                                          (Graphics.Collage.filled (colorOf x)
                                                                   (Graphics.Collage.rect blockSize blockSize))

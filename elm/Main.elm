@@ -1,5 +1,6 @@
 module Main where
 
+import Dict
 import Graphics.Element
 import Keyboard
 import Maybe
@@ -33,7 +34,7 @@ main = Signal.map (toScene << fst)
 
 
 score : GameField -> Int
-score f = List.sum (List.map (\ x -> if List.isEmpty x then 0 else 2 ^ (List.length x - 1)) (List.concat f))
+score f = List.sum (List.map (\ x -> if List.isEmpty x then 0 else 2 ^ (List.length x - 1)) (Dict.values f))
 
 moves : GameField -> Moves
 moves f = {up = move Up f, down = move Down f, left = move Left f, right = move Right f}
