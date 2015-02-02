@@ -18,7 +18,6 @@ addRandomBlock f s =
                                          then [p]
                                          else x) f,
               s')
-    
 
 getVars : Direction -> Position -> (Position, Int, Int)
 getVars d (i,j) = let i' = if d == Up then i - 1 else if d == Down then i + 1 else i
@@ -53,7 +52,7 @@ shiftOnceAt d q f = let (q', coord, bound) = getVars d q in indexedMatrixMap
 
 merge : Direction -> GameField -> GameField
 merge = atToWhole mergeOnceAt
-  
+
 mergeOnceAt : Direction -> Position -> GameField -> GameField
 mergeOnceAt d q f = let (q', coord, bound) = getVars d q
                         entry = (entryAt f q)
@@ -69,4 +68,3 @@ mergeOnceAt d q f = let (q', coord, bound) = getVars d q
 
 move : Direction -> GameField -> GameField
 move d f = (shift d << merge d << shift d) f
-

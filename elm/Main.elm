@@ -1,8 +1,6 @@
 module Main where
 
-import Color
 import Graphics.Element
-import Graphics.Collage
 import Keyboard
 import Maybe
 import List

@@ -32,4 +32,3 @@ initField n = indexedMatrixMap (\ p x -> if p == (n // 2, 0) || p == (n // 2, n 
 
 emptyField : Int -> GameField
 emptyField n = List.repeat n (List.repeat n [])
-

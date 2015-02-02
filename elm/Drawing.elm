@@ -33,4 +33,3 @@ toScene f = let size = round sceneSize in
                            ([Graphics.Collage.filled bg (Graphics.Collage.rect sceneSize sceneSize)] ++
                              (toForms << emptyField) dimension ++
                              (toForms f))
-
