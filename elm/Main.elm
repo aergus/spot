@@ -19,7 +19,9 @@ main : Signal.Signal Graphics.Element.Element
 main = Signal.map (toScene << fst)
   (Signal.foldp (\ (t, x) (f, y) -> let seed = Maybe.withDefault ((Random.initialSeed << round << Time.inSeconds) t) y
                                     in Maybe.withDefault (f, y) (Maybe.map
-    (\ d -> let (f', newSeed) = addRandomBlock (move d f) seed in (f', Just newSeed)) x))
+    (\ d -> let f' = move d f in if f == f'
+                                 then (f, Just seed)
+                                 else let (f'', newSeed) = addRandomBlock f' seed  in (f'', Just newSeed)) x))
                 (initField dimension, Nothing)
                 (Time.timestamp (Signal.map (\ v -> if v == {x = 0, y = 1}
                                                     then Just Up
