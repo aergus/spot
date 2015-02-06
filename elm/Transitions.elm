@@ -14,9 +14,10 @@ addRandomBlock f s =
       l = List.length frees
   in if l == 0
      then (f, s)
-     else let (i, s') = Random.generate (Random.int 0 (l - 1)) s
-          in (Dict.map (\ p x -> if p == elemAt frees i
-                                 then [p]
+     else let range = dimension // 2
+              (i, s') = Random.generate (Random.int 0 ((l - 1) * range)) s
+          in (Dict.map (\ p x -> if p == elemAt frees (i // range)
+                                 then List.repeat (1 + (i % range)) p
                                  else x) f,
               s')
 
