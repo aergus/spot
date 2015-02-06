@@ -16,7 +16,11 @@ import Transitions (..)
 import Types (..)
 
 main : Signal.Signal Graphics.Element.Element
-main = Signal.map (toScene << fst)
+main = Signal.map (\ (f, s) -> if f == move Up f && f == move Down f
+                                                 && f == move Left f
+                                                 && f == move Right f
+                               then toScene f True
+                               else toScene f False)
   (Signal.foldp (\ (t, x) (f, y) -> let seed = Maybe.withDefault ((Random.initialSeed << round << Time.inSeconds) t) y
                                     in Maybe.withDefault (f, y) (Maybe.map
     (\ d -> let f' = move d f in if f == f'

@@ -40,10 +40,19 @@ toForms f = let toOffset k = -sceneSize / 2 + blockSize / 2 + marginSize +
     )
     f)
 
-toScene : GameField -> Graphics.Element.Element
-toScene f = let size = round sceneSize in
+toScene : GameField -> Bool -> Graphics.Element.Element
+toScene f s = let size = round sceneSize in
   Graphics.Collage.collage size
                            size
                            ([Graphics.Collage.filled bg (Graphics.Collage.rect sceneSize sceneSize)] ++
                              (toForms << emptyField) dimension ++
-                             (toForms f))
+                             (toForms f) ++
+                             (if s
+                              then [Graphics.Collage.filled (Color.rgba 0 0 0 0.95)
+                                                            (Graphics.Collage.rect sceneSize sceneSize),
+                                   (Graphics.Collage.toForm << Text.centered
+                                                            << Text.height blockSize
+                                                            << Text.color Color.white
+                                                            << Text.bold
+                                                            << Text.fromString) "Game\nOver"]
+                              else []))
