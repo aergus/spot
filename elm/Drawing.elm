@@ -15,7 +15,7 @@ colorOf : Int -> Color.Color
 colorOf l = if l == 0
             then blockBg
             else let n = l - 1
-                 in Color.rgb ((221 * n) % 255) ((25 * n) % 255) 250
+                 in Color.rgb ((201 * n) % 256) ((223 * n) % 256) 255
 
 
 toForms : GameField -> List Graphics.Collage.Form
@@ -24,7 +24,7 @@ toForms f = let toOffset k = -sceneSize / 2 + blockSize / 2 + marginSize +
   Dict.values (Dict.map
     (\ (i, j) x ->
       let l = List.length x
-          c = colorOf l
+          c = colorOf (1 + log2 l)
           form = Graphics.Collage.filled c (Graphics.Collage.rect blockSize blockSize)
       in Graphics.Collage.move (toOffset j, -(toOffset i))
                                (if l == 0
