@@ -6,8 +6,9 @@
 <script type="text/javascript" src="elm.js"></script>
 </head>
 <body>
-</body>
 <script type="text/javascript">
 var spot = Elm.fullscreen(Elm.Main, {initialization : []});
+spot.ports.initialization.send([]);
 </script>
+</body>
 </html>
