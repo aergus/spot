@@ -52,9 +52,3 @@ signal = Time.timestamp (Signal.mergeMany
                                      then Move Right
                                      else Useless)
                 Keyboard.arrows])
-
-score : GameField -> Int
-score f = List.sum (List.map (\ x -> if List.isEmpty x then 0 else 2 ^ (List.length x - 1)) (Dict.values f))
-
-moves : GameField -> Moves
-moves f = {up = move Up f, down = move Down f, left = move Left f, right = move Right f}

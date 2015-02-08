@@ -11,15 +11,15 @@ import Types (..)
 
 addRandomBlock : GameField -> Random.Seed -> (GameField, Random.Seed)
 addRandomBlock f s =
-  let frees = (List.concat << Dict.values) (Dict.map (\ p x -> if List.isEmpty x then [p] else []) f)
+  let frees = (Dict.keys << Dict.filter (\ p b -> isEmpty b)) f
       l = List.length frees
   in if l == 0
      then (f, s)
      else let range = dimension // 2
               (i, s') = Random.generate (Random.int 0 ((l - 1) * range)) s
-          in (Dict.map (\ p x -> if p == elemAt frees (i // range)
-                                 then List.repeat (2 ^ (i % range)) p
-                                 else x) f,
+          in (Dict.insert (elemAt frees (i // range))
+                          (StationaryBlock (1 + i % range))
+                          f,
               s')
 
 nextPosByDir : Direction -> Position -> Position
@@ -39,14 +39,14 @@ shift = atToWhole shiftAt
 
 shiftAt : Direction -> Position -> GameField -> GameField
 shiftAt d p f = let x = entryAt f p
-                in if List.isEmpty x
+                in if isEmpty x
                    then f
-                   else Dict.insert (scan d p f) x (Dict.insert p [] f)
+                   else Dict.insert (scan d p f) x (Dict.insert p EmptyBlock f)
 
 scan : Direction -> Position -> GameField -> Position
 scan d p f = let p' = nextPosByDir d p
                  next = Dict.get p' f
-             in if List.isEmpty (Maybe.withDefault [(-1, -1)] next)
+             in if isEmpty (Maybe.withDefault NoBlock next)
                 then scan d p' f
                 else p
 
@@ -57,9 +57,11 @@ mergeAt : Direction -> Position -> GameField -> GameField
 mergeAt d p f = let x = entryAt f p
                     p' = nextPosByDir d p
                     next = entryAt f p'
-                in if List.isEmpty x || List.length x /= List.length next
+                    v = valueOf x
+                    v' = valueOf next
+                in if isEmpty x || v /= v'
                    then f
-                   else Dict.insert p' (x ++ next) (Dict.insert p [] f)
+                   else Dict.insert p' (StationaryBlock (v + 1)) (Dict.insert p EmptyBlock f)
 
 move : Direction -> GameField -> GameField
 move d f = (shift d << merge d << shift d) f

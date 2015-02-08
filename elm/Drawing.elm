@@ -23,8 +23,8 @@ toForms f = let toOffset k = sceneSize / 2 - blockSize / 2 - marginSize -
                              (blockSize + marginSize) * toFloat k in
   Dict.values (Dict.map
     (\ (i, j) x ->
-      let l = List.length x
-          c = colorOf (1 + log2 l)
+      let l = valueOf x
+          c = colorOf l
           form = Graphics.Collage.filled c (Graphics.Collage.rect blockSize blockSize)
       in Graphics.Collage.move (-(toOffset i), toOffset j)
                                (if l == 0
@@ -36,7 +36,7 @@ toForms f = let toOffset k = sceneSize / 2 - blockSize / 2 - marginSize -
                                   << Text.color Color.black
                                   << Text.bold
                                   << Text.fromString
-                                  << toString) (2 * l)])
+                                  << toString) (2 ^ l)])
     )
     f)
 
