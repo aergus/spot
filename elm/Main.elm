@@ -31,6 +31,7 @@ update (t, e) x = case e of
   Initialization -> let f = emptyField dimension
                         (f', s') = addRandomBlock f ((Random.initialSeed << round
                                                                          << Time.inSeconds) t)
+
                     in Just (addRandomBlock f' s')
   Move d -> Maybe.map (\ (f, s) -> let f' = move d f
                                    in if f == f'

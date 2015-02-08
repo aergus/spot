@@ -4,7 +4,7 @@ import Dict
 
 type alias Position = (Int, Int)
 
-type Block = EmptyBlock | StationaryBlock Int  | MovingBlock Int Position | NoBlock
+type Block = EmptyBlock | StationaryBlock Int  | MovingBlock Int Position Bool | NoBlock
 
 type alias GameField = Dict.Dict Position Block
 
