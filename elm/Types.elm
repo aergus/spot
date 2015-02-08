@@ -1,6 +1,7 @@
 module Types where
 
 import Dict
+import Time
 
 type alias Position = (Int, Int)
 
@@ -10,4 +11,4 @@ type alias GameField = Dict.Dict Position Block
 
 type Direction = Up | Down | Left | Right
 
-type Event = Initialization Int | Move Direction | Useless
+type Event = Initialization Int | Move Direction | Animation Time.Time | Useless

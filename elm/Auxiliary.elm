@@ -30,6 +30,9 @@ elemAt l n = if n == 0 then List.head l else elemAt (List.tail l) (n - 1)
 entryAt : GameField -> Position -> Block
 entryAt d k = Maybe.withDefault NoBlock (Dict.get k d)
 
+addThird : c -> (a, b) -> (a, b, c)
+addThird z (x, y) = (x, y, z)
+
 log2 : Int -> Int
 log2 n = case n of 0 -> -1
                    1 -> 0

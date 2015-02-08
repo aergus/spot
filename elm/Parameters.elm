@@ -3,6 +3,7 @@ module Parameters where
 import Color
 import Dict
 import List
+import Time
 
 import Auxiliary (..)
 import Types (..)
@@ -24,6 +25,9 @@ bg = Color.black
 
 blockBg : Color.Color
 blockBg = Color.rgb 200 200 200
+
+animationDuration : Time.Time
+animationDuration = 250 * Time.millisecond
 
 emptyField : Int -> GameField
 emptyField n = Dict.fromList (List.concatMap (\ i -> (List.map (\ k -> ((i, k), EmptyBlock)) [0 .. (n - 1)])) [0 .. (n - 1)])
