@@ -14,3 +14,5 @@ type alias Moves = {up : GameField,
                     right : GameField}
 
 type Direction = Up | Down | Left | Right
+
+type Event = Initialization | Move (Maybe Direction)
