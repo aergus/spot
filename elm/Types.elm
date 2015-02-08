@@ -10,4 +10,4 @@ type alias GameField = Dict.Dict Position Block
 
 type Direction = Up | Down | Left | Right
 
-type Event = Initialization | Move Direction | Useless
+type Event = Initialization Int | Move Direction | Useless

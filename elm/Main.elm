@@ -15,7 +15,7 @@ import Parameters (..)
 import Transitions (..)
 import Types (..)
 
-port initialization : Signal ()
+port initialization : Signal Int
 
 main : Signal.Signal Graphics.Element.Element
 main = Signal.map (\x -> Maybe.withDefault Graphics.Element.empty
@@ -26,13 +26,11 @@ main = Signal.map (\x -> Maybe.withDefault Graphics.Element.empty
   x))
                   (Signal.foldp update Nothing signal)
 
-update : (Time.Time, Event) -> Maybe (GameField, Random.Seed) -> Maybe (GameField, Random.Seed)
-update (t, e) x = case e of
-  Initialization -> let f = emptyField dimension
-                        (f', s') = addRandomBlock f ((Random.initialSeed << round
-                                                                         << Time.inSeconds) t)
-
-                    in Just (addRandomBlock f' s')
+update : Event -> Maybe (GameField, Random.Seed) -> Maybe (GameField, Random.Seed)
+update e x = case e of
+  Initialization  t-> let f = emptyField dimension
+                          (f', s') = addRandomBlock f (Random.initialSeed t)
+                      in Just (addRandomBlock f' s')
   Move d -> Maybe.map (\ (f, s) -> let f' = move d f
                                    in if f == f'
                                       then (f, s)
@@ -40,9 +38,9 @@ update (t, e) x = case e of
                       x
   _ -> x
 
-signal : Signal.Signal (Time.Time, Event)
-signal = Time.timestamp (Signal.mergeMany
-  [Signal.map (always Initialization) initialization,
+signal : Signal.Signal Event
+signal = Signal.mergeMany
+  [Signal.map Initialization initialization,
    Signal.map (\ v -> if v == {x = 0, y = 1}
                       then Move Up
                       else if v == {x = 0, y = -1}
@@ -52,4 +50,4 @@ signal = Time.timestamp (Signal.mergeMany
                                 else if v == {x = 1, y = 0}
                                      then Move Right
                                      else Useless)
-                Keyboard.arrows])
+               Keyboard.arrows]

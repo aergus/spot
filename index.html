@@ -7,8 +7,8 @@
 </head>
 <body>
 <script type="text/javascript">
-var spot = Elm.fullscreen(Elm.Main, {initialization : []});
-spot.ports.initialization.send([]);
+var spot = Elm.fullscreen(Elm.Main, {initialization : 0});
+spot.ports.initialization.send(Date.now());
 </script>
 </body>
 </html>
