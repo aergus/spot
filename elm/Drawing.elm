@@ -19,14 +19,14 @@ colorOf l = if l == 0
 
 
 toForms : GameField -> List Graphics.Collage.Form
-toForms f = let toOffset k = -sceneSize / 2 + blockSize / 2 + marginSize +
+toForms f = let toOffset k = sceneSize / 2 - blockSize / 2 - marginSize -
                              (blockSize + marginSize) * toFloat k in
   Dict.values (Dict.map
     (\ (i, j) x ->
       let l = List.length x
           c = colorOf (1 + log2 l)
           form = Graphics.Collage.filled c (Graphics.Collage.rect blockSize blockSize)
-      in Graphics.Collage.move (toOffset j, -(toOffset i))
+      in Graphics.Collage.move (-(toOffset i), toOffset j)
                                (if l == 0
                                 then form
                                 else Graphics.Collage.group

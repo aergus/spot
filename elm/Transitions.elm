@@ -22,9 +22,9 @@ addRandomBlock f s =
               s')
 
 getVars : Direction -> Position -> (Position, Int, Int)
-getVars d (i,j) = let i' = if d == Up then i - 1 else if d == Down then i + 1 else i
-                      j' = if d == Left then j - 1 else if d == Right then j + 1 else j
-                      coord = if d == Up || d == Down then i else j
+getVars d (i,j) = let j' = if d == Up then j - 1 else if d == Down then j + 1 else j
+                      i' = if d == Left then i - 1 else if d == Right then i + 1 else i
+                      coord = if d == Up || d == Down then j else i
                       bound = if d == Up || d == Left then 0 else dimension - 1
                   in ((i', j'), coord, bound)
 
