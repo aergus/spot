@@ -33,7 +33,8 @@ blockForm : Int -> Graphics.Collage.Form
 blockForm l = (Graphics.Collage.group [Graphics.Collage.filled (colorOf l)
                                                                 blockRect,
   (Graphics.Collage.toForm << Text.centered
-                           << Text.height (blockSize * 0.5)
+                           << Text.height (blockSize * 0.4)
+                           << Text.typeface ["sans-serif"]
                            << Text.color Color.black
                            << Text.bold
                            << Text.fromString
@@ -67,8 +68,8 @@ movingForms x f = Maybe.withDefault [] (Maybe.map
   x)
 
 backgroundForms : List Graphics.Collage.Form
-backgroundForms = Dict.values (Dict.map (\ p x -> moveByOffset p (Graphics.Collage.filled blockBg blockRect))
-                                        (emptyField dimension))
+backgroundForms = List.map (\ p -> moveByOffset p (Graphics.Collage.filled blockBg blockRect))
+                           (Dict.keys (emptyField dimension))
 
 toScene : Bool -> Maybe Time.Time ->  GameField -> Graphics.Element.Element
 toScene o a f = let size = round sceneSize in
@@ -83,6 +84,7 @@ toScene o a f = let size = round sceneSize in
                                                             (Graphics.Collage.rect sceneSize sceneSize),
                                    (Graphics.Collage.toForm << Text.centered
                                                             << Text.height blockSize
+                                                            << Text.typeface ["sans-serif"]
                                                             << Text.color Color.white
                                                             << Text.bold
                                                             << Text.fromString) "Game\nOver"]

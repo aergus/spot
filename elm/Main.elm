@@ -20,7 +20,7 @@ port initialization : Signal Int
 main : Signal.Signal Graphics.Element.Element
 main = Signal.map (\x -> Maybe.withDefault Graphics.Element.empty
                                           (Maybe.map
-  (\ (f, s, y) -> toScene (f == move Up f && f == move Down f
+  (\ (f, _, y) -> toScene (f == move Up f && f == move Down f
                                           && f == move Left f
                                           && f == move Right f)
                           y

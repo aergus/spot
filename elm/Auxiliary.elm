@@ -11,29 +11,29 @@ isEmpty b = case b of EmptyBlock -> True
                       _ -> False
 
 isFixed : Block -> Bool
-isFixed b = case b of StationaryBlock i -> True
-                      MovingBlock i p True -> True
+isFixed b = case b of StationaryBlock _ -> True
+                      MovingBlock _ _ True -> True
                       _ -> False
 
 isAnimated : Block -> Bool
-isAnimated b = case b of MovingBlock i p v -> True
+isAnimated b = case b of MovingBlock _ _ _ -> True
                          _ -> False
 
 isMerged : Block -> Bool
-isMerged b = case b of MovingBlock i p True -> True
+isMerged b = case b of MovingBlock _ _ True -> True
                        _ -> False
 
 valueOf : Block -> Int
 valueOf b = case b of StationaryBlock i -> i
-                      MovingBlock i p v -> i
+                      MovingBlock i _ _ -> i
                       _ -> 0
 
 originOf : Block -> Maybe Position
-originOf b = case b of MovingBlock i p v -> Just p
+originOf b = case b of MovingBlock _ p _ -> Just p
                        _ -> Nothing
 
 stop : Block -> Block
-stop b = case b of MovingBlock i p v -> StationaryBlock i
+stop b = case b of MovingBlock i _ _ -> StationaryBlock i
                    b' -> b'
 
 elemAt : List a -> Int -> a
@@ -44,8 +44,3 @@ entryAt d k = Maybe.withDefault NoBlock (Dict.get k d)
 
 addThird : c -> (a, b) -> (a, b, c)
 addThird z (x, y) = (x, y, z)
-
-log2 : Int -> Int
-log2 n = case n of 0 -> -1
-                   1 -> 0
-                   k -> 1 + (log2 (n // 2))
