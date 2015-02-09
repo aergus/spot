@@ -27,7 +27,7 @@ blockBg : Color.Color
 blockBg = Color.rgb 200 200 200
 
 animationDuration : Time.Time
-animationDuration = 250 * Time.millisecond
+animationDuration = 100 * Time.millisecond
 
 emptyField : Int -> GameField
 emptyField n = Dict.fromList (List.concatMap (\ i -> (List.map (\ k -> ((i, k), EmptyBlock)) [0 .. (n - 1)])) [0 .. (n - 1)])

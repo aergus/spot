@@ -1,7 +1,5 @@
 module Main where
 
-import Debug
-
 import Dict
 import Graphics.Element
 import Keyboard
@@ -22,9 +20,11 @@ port initialization : Signal Int
 main : Signal.Signal Graphics.Element.Element
 main = Signal.map (\x -> Maybe.withDefault Graphics.Element.empty
                                           (Maybe.map
-  (\ (f, s, v) -> toScene f (f == move Up f && f == move Down f
-                                            && f == move Left f
-                                            && f == move Right f))
+  (\ (f, s, y) -> toScene (f == move Up f && f == move Down f
+                                          && f == move Left f
+                                          && f == move Right f)
+                          y
+                          f)
   x))
                   (Signal.foldp update Nothing signal)
 
@@ -38,15 +38,16 @@ update e x = case e of
                                       else let f' = move d f
                                            in if f == f'
                                            then (f, s, Nothing)
-                                           else addThird (Just 0) (addRandomBlock f' s))
+                                           else (f', s, Just 0))
                       x
   Animation t -> Maybe.map
     (\ (f, s, v) -> Maybe.withDefault (f, s, v)
-                                      (Maybe.map (\ k -> let k' = Debug.log "k'"  (k + t)
-                                                         in if k' >= animationDuration
-                                                         then (f, s, Nothing)
-                                                         else (f, s, Just k'))
-                                                 v))
+      (Maybe.map (\ k -> let k' = k + t
+                         in if k' >= animationDuration
+                            then addThird Nothing
+                                          (addRandomBlock (Dict.map (\ p b -> stop b) f) s)
+                            else (f, s, Just k'))
+      v))
     x
   _ -> x
 
@@ -66,5 +67,5 @@ signal = let relevantArrows = Signal.keepIf (\ v -> v.x == 0 || v.y == 0)
                                      then Move Right
                                      else Useless)
               relevantArrows,
-   Signal.map Animation (Time.fpsWhen 20 (Time.since animationDuration
+   Signal.map Animation (Time.fpsWhen 60 (Time.since animationDuration
                                                      relevantArrows))]

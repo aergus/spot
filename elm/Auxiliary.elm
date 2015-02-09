@@ -10,6 +10,15 @@ isEmpty : Block -> Bool
 isEmpty b = case b of EmptyBlock -> True
                       _ -> False
 
+isFixed : Block -> Bool
+isFixed b = case b of StationaryBlock i -> True
+                      MovingBlock i p True -> True
+                      _ -> False
+
+isAnimated : Block -> Bool
+isAnimated b = case b of MovingBlock i p v -> True
+                         _ -> False
+
 isMerged : Block -> Bool
 isMerged b = case b of MovingBlock i p True -> True
                        _ -> False
@@ -23,6 +32,9 @@ originOf : Block -> Maybe Position
 originOf b = case b of MovingBlock i p v -> Just p
                        _ -> Nothing
 
+stop : Block -> Block
+stop b = case b of MovingBlock i p v -> StationaryBlock i
+                   b' -> b'
 
 elemAt : List a -> Int -> a
 elemAt l n = if n == 0 then List.head l else elemAt (List.tail l) (n - 1)
