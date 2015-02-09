@@ -1,3 +1,5 @@
+# Some Power of Two
+
 a [2048][1] clone
 written in [Elm][2]
 as an assignment for a [lecture course on functional programming][3]

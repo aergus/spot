@@ -15,32 +15,57 @@ import Parameters (..)
 import Transitions (..)
 import Types (..)
 
+port initialization : Signal Int
+
 main : Signal.Signal Graphics.Element.Element
-main = Signal.map (\ (f, s) -> if f == move Up f && f == move Down f
-                                                 && f == move Left f
-                                                 && f == move Right f
-                               then toScene f True
-                               else toScene f False)
-  (Signal.foldp (\ (t, x) (f, y) -> let seed = Maybe.withDefault ((Random.initialSeed << round << Time.inSeconds) t) y
-                                    in Maybe.withDefault (f, y) (Maybe.map
-    (\ d -> let f' = move d f in if f == f'
-                                 then (f, Just seed)
-                                 else let (f'', newSeed) = addRandomBlock f' seed  in (f'', Just newSeed)) x))
-                (initField dimension, Nothing)
-                (Time.timestamp (Signal.map (\ v -> if v == {x = 0, y = 1}
-                                                    then Just Up
-                                                    else if v == {x = 0, y = -1}
-                                                         then Just Down
-                                                         else if v == {x = -1, y = 0}
-                                                              then Just Left
-                                                              else if v == {x = 1, y = 0}
-                                                                   then Just Right
-                                                                   else Nothing)
-                                             Keyboard.arrows)))
+main = Signal.map (\x -> Maybe.withDefault Graphics.Element.empty
+                                          (Maybe.map
+  (\ (f, _, y) -> toScene (f == move Up f && f == move Down f
+                                          && f == move Left f
+                                          && f == move Right f)
+                          y
+                          f)
+  x))
+                  (Signal.foldp update Nothing signal)
 
+update : Event -> Maybe (GameField, Random.Seed, Maybe Time.Time) -> Maybe (GameField, Random.Seed, Maybe Time.Time)
+update e x = case e of
+  Initialization t -> let f = emptyField dimension
+                          (f', s') = addRandomBlock f (Random.initialSeed t)
+                      in (Just << addThird Nothing) (addRandomBlock f' s')
+  Move d -> Maybe.map (\ (f, s, v) -> if v /= Nothing
+                                      then (f, s ,v)
+                                      else let f' = move d f
+                                           in if f == f'
+                                           then (f, s, Nothing)
+                                           else (f', s, Just 0))
+                      x
+  Animation t -> Maybe.map
+    (\ (f, s, v) -> Maybe.withDefault (f, s, v)
+      (Maybe.map (\ k -> let k' = k + t
+                         in if k' >= animationDuration
+                            then addThird Nothing
+                                          (addRandomBlock (Dict.map (\ p b -> stop b) f) s)
+                            else (f, s, Just k'))
+      v))
+    x
+  _ -> x
 
-score : GameField -> Int
-score f = List.sum (List.map (\ x -> if List.isEmpty x then 0 else 2 ^ (List.length x - 1)) (Dict.values f))
-
-moves : GameField -> Moves
-moves f = {up = move Up f, down = move Down f, left = move Left f, right = move Right f}
+signal : Signal.Signal Event
+signal = let relevantArrows = Signal.keepIf (\ v -> v.x == 0 || v.y == 0)
+                                            {x = 0, y = 0}
+                                            Keyboard.arrows
+         in Signal.mergeMany
+  [Signal.map Initialization initialization,
+   Signal.map (\ v -> if v == {x = 0, y = 1}
+                      then Move Up
+                      else if v == {x = 0, y = -1}
+                           then Move Down
+                           else if v == {x = -1, y = 0}
+                                then Move Left
+                                else if v == {x = 1, y = 0}
+                                     then Move Right
+                                     else Useless)
+              relevantArrows,
+   Signal.map Animation (Time.fpsWhen 60 (Time.since animationDuration
+                                                     relevantArrows))]

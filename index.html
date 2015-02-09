@@ -2,12 +2,13 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SPoT</title>
+<title>Some Power of Two</title>
 <script type="text/javascript" src="elm.js"></script>
 </head>
 <body>
-</body>
 <script type="text/javascript">
-var spot = Elm.fullscreen(Elm.Main);
+var spot = Elm.fullscreen(Elm.Main, {initialization : 0});
+spot.ports.initialization.send(Date.now());
 </script>
+</body>
 </html>
