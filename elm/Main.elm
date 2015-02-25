@@ -19,14 +19,7 @@ port initialization : Signal Int
 
 main : Signal.Signal Graphics.Element.Element
 main = Signal.map (\x -> Maybe.withDefault Graphics.Element.empty
-                                          (Maybe.map
-  (\ s -> let fd = s.field
-          in toScene (fd == move Up fd && fd == move Down fd
-                                       && fd == move Left fd
-                                       && fd == move Right fd)
-                      s.animation
-                      fd)
-  x))
+                                          (Maybe.map toScene x))
                   (Signal.foldp update Nothing signal)
 
 update : Event -> Maybe GameState -> Maybe GameState

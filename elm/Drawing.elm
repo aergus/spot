@@ -11,6 +11,7 @@ import Time
 
 import Auxiliary (..)
 import Parameters (..)
+import Transitions (..) -- to be removed
 import Types (..)
 
 blockRect : Graphics.Collage.Shape
@@ -71,15 +72,18 @@ backgroundForms : List Graphics.Collage.Form
 backgroundForms = List.map (\ p -> moveByOffset p (Graphics.Collage.filled blockBg blockRect))
                            (Dict.keys (emptyField dimension))
 
-toScene : Bool -> Maybe Time.Time ->  GameField -> Graphics.Element.Element
-toScene o a f = let size = round sceneSize in
+toScene : GameState -> Graphics.Element.Element
+toScene s = let size = round sceneSize in
   Graphics.Collage.collage size
                            size
                            ([Graphics.Collage.filled bg (Graphics.Collage.rect sceneSize sceneSize)] ++
                              backgroundForms ++
-                             (stationaryForms f) ++
-                             (movingForms a f) ++
-                             (if o
+                             (stationaryForms s.field) ++
+                             (movingForms s.animation s.field) ++
+                             (if let f = s.field
+                                 in f == move Up f && f == move Down f
+                                                   && f == move Left f
+                                                   && f == move Right f
                               then [Graphics.Collage.filled (Color.rgba 0 0 0 0.95)
                                                             (Graphics.Collage.rect sceneSize sceneSize),
                                    (Graphics.Collage.toForm << Text.centered
