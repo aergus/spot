@@ -24,7 +24,7 @@ colorOf l = let n = l - 1
             in Color.rgb ((201 * n) % 256) ((223 * n) % 256) 255
 
 toOffset : Int -> Float
-toOffset k = -(sceneSize / 2 - blockSize / 2 - marginSize - (blockSize + marginSize) * toFloat k)
+toOffset k = -sceneSize / 2 + blockSize / 2 + marginSize + (blockSize + marginSize) * toFloat k
 
 moveByOffset : (Int, Int) -> Graphics.Collage.Form -> Graphics.Collage.Form
 moveByOffset (i, j) = Graphics.Collage.move (toOffset i, toOffset j)

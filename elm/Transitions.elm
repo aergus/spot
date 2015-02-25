@@ -29,7 +29,7 @@ nextPosByDir d (i, j) = case d of Up -> (i, j + 1)
                                   Right -> (i + 1, j)
 
 atToWhole : (Direction -> Position -> GameField -> GameField) -> Direction -> GameField -> GameField
-atToWhole fct d f =  List.foldr (if d == Down || d == Right then (<<) else (>>))
+atToWhole fct d f =  List.foldr (if d == Up || d == Right then (<<) else (>>))
                                 identity
                                 (List.map (fct d) (Dict.keys f))
                                 f
