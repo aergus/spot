@@ -15,5 +15,13 @@ type Direction = Up | Down | Left | Right
 
 type Event = Initialization Int | Move Direction | Animation Time.Time | Useless
 
+type alias Moves = {up: GameField,
+                    down : GameField,
+                    left: GameField,
+                    right: GameField}
+
 type alias GameState =
-  {field : GameField, seed : Random.Seed, animation : Maybe Time.Time}
+  {field : GameField,
+   seed : Random.Seed,
+   animation : Maybe Time.Time,
+   moves : Moves}

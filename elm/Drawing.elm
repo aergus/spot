@@ -81,9 +81,10 @@ toScene s = let size = round sceneSize in
                              (stationaryForms s.field) ++
                              (movingForms s.animation s.field) ++
                              (if let f = s.field
-                                 in f == move Up f && f == move Down f
-                                                   && f == move Left f
-                                                   && f == move Right f
+                                 in s.animation == Nothing && {up = f,
+                                                               down = f,
+                                                               left = f,
+                                                               right = f} == s.moves
                               then [Graphics.Collage.filled (Color.rgba 0 0 0 0.95)
                                                             (Graphics.Collage.rect sceneSize sceneSize),
                                    (Graphics.Collage.toForm << Text.centered

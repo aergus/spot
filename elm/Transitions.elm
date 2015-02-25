@@ -76,3 +76,9 @@ mergeAt d p f = let x = entryAt f p
 
 move : Direction -> GameField -> GameField
 move d f = (shift d << merge d << shift d) f
+
+nextMoves : GameField -> Moves
+nextMoves f = {up = move Up f,
+               down = move Down f,
+               left = move Left f,
+               right = move Right f}

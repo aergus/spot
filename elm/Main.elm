@@ -27,13 +27,17 @@ update e x = case e of
   Initialization t -> let fd = emptyField dimension
                           (fd', sd') = addRandomBlock fd (Random.initialSeed t)
                           (fd'', sd'') = addRandomBlock fd' sd'
-                      in Just {field = fd'', seed = sd'', animation = Nothing}
+                      in Just {field = fd'',
+                               seed = sd'',
+                               animation = Nothing,
+                               moves = nextMoves fd''}
   Move d -> Maybe.map (\ s -> if s.animation /= Nothing
                               then s
-                              else let f' = move d s.field
-                                   in if s.field == f'
+                              else let fd = moveAt s.moves d
+                                   in if s.field == fd
                                       then s
-                                      else {s | field <- f', animation <- Just 0})
+                                      else {s | field <- fd,
+                                                animation <- Just 0})
                       x
   Animation t -> Maybe.map
     (\ s -> Maybe.withDefault s
@@ -41,7 +45,10 @@ update e x = case e of
                          in if k' >= animationDuration
                             then let fd = (Dict.map (\ p b -> stop b) s.field)
                                      (fd', sd') = addRandomBlock fd s.seed
-                                 in {field = fd', seed = sd', animation = Nothing}
+                                 in {s | field <- fd',
+                                         seed <- sd',
+                                         animation <- Nothing,
+                                         moves <- nextMoves fd'}
                             else {s | animation <- Just k'})
       s.animation))
     x

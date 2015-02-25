@@ -36,11 +36,14 @@ stop : Block -> Block
 stop b = case b of MovingBlock i _ _ -> StationaryBlock i
                    b' -> b'
 
+moveAt : Moves -> Direction -> GameField
+moveAt m d = case d of Up -> m.up
+                       Down -> m.down
+                       Left -> m.left
+                       Right -> m.right
+
 elemAt : List a -> Int -> a
 elemAt l n = if n == 0 then List.head l else elemAt (List.tail l) (n - 1)
 
 entryAt : GameField -> Position -> Block
 entryAt d k = Maybe.withDefault NoBlock (Dict.get k d)
-
-addThird : c -> (a, b) -> (a, b, c)
-addThird z (x, y) = (x, y, z)
