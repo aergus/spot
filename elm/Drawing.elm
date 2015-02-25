@@ -13,9 +13,6 @@ import Auxiliary (..)
 import Parameters (..)
 import Types (..)
 
-blockRect : Graphics.Collage.Shape
-blockRect = Graphics.Collage.rect blockSize blockSize
-
 emptyForm : Graphics.Collage.Form
 emptyForm = Graphics.Collage.toForm Graphics.Element.empty
 
@@ -24,21 +21,26 @@ colorOf l = let n = l - 1
             in Color.rgb ((201 * n) % 256) ((223 * n) % 256) 255
 
 toOffset : Int -> Float
-toOffset k = sceneSize / 2 - blockSize / 2 - marginSize - (blockSize + marginSize) * toFloat k
+toOffset k = -sceneSize / 2 + blockSize / 2 + marginSize + (blockSize + marginSize) * toFloat k
 
 moveByOffset : (Int, Int) -> Graphics.Collage.Form -> Graphics.Collage.Form
-moveByOffset (i, j) = Graphics.Collage.move (-(toOffset i), toOffset j)
+moveByOffset (i, j) = Graphics.Collage.move (toOffset i, toOffset j)
 
 blockForm : Int -> Graphics.Collage.Form
-blockForm l = (Graphics.Collage.group [Graphics.Collage.filled (colorOf l)
-                                                                blockRect,
-  (Graphics.Collage.toForm << Text.centered
-                           << Text.height (blockSize * 0.4)
-                           << Text.typeface ["sans-serif"]
-                           << Text.color Color.black
-                           << Text.bold
-                           << Text.fromString
-                           << toString) (2 ^ l)])
+blockForm l = let size = blockSize
+                  blockRect = Graphics.Collage.rect size size
+              in Graphics.Collage.group
+  [Graphics.Collage.filled (colorOf l) blockRect,
+   let s = Graphics.Collage.solid mg
+   in Graphics.Collage.outlined {s | width <- marginSize * 0.6,
+                                     cap <- Graphics.Collage.Round} blockRect,
+   (Graphics.Collage.toForm << Text.centered
+                            << Text.height (blockSize * 0.4)
+                            << Text.typeface ["sans-serif"]
+                            << Text.color Color.black
+                            << Text.bold
+                            << Text.fromString
+                            << toString) (2 ^ l)]
 
 stationaryForms : GameField -> List Graphics.Collage.Form
 stationaryForms f = List.map
@@ -53,9 +55,9 @@ movingForms : Maybe Time.Time -> GameField -> List Graphics.Collage.Form
 movingForms x f = Maybe.withDefault [] (Maybe.map
   (\ t -> List.map
     (\ ((i, j), b) ->
-      case b of MovingBlock n (i', j') v -> let x = -(toOffset i)
+      case b of MovingBlock n (i', j') v -> let x = toOffset i
                                                 y = toOffset j
-                                                x' = -(toOffset i')
+                                                x' = toOffset i'
                                                 y' = toOffset j'
                                                 scale = t / animationDuration
                                              in Graphics.Collage.move  (x' + scale * (x - x'),
@@ -68,18 +70,24 @@ movingForms x f = Maybe.withDefault [] (Maybe.map
   x)
 
 backgroundForms : List Graphics.Collage.Form
-backgroundForms = List.map (\ p -> moveByOffset p (Graphics.Collage.filled blockBg blockRect))
-                           (Dict.keys (emptyField dimension))
+backgroundForms = let size = blockSize + marginSize * 0.5
+                  in List.map (\ p -> moveByOffset p
+  (Graphics.Collage.filled blockBg (Graphics.Collage.rect size size)))
+                              (Dict.keys (emptyField dimension))
 
-toScene : Bool -> Maybe Time.Time ->  GameField -> Graphics.Element.Element
-toScene o a f = let size = round sceneSize in
+toScene : GameState -> Graphics.Element.Element
+toScene s = let size = round sceneSize in
   Graphics.Collage.collage size
                            size
                            ([Graphics.Collage.filled bg (Graphics.Collage.rect sceneSize sceneSize)] ++
                              backgroundForms ++
-                             (stationaryForms f) ++
-                             (movingForms a f) ++
-                             (if o
+                             (stationaryForms s.field) ++
+                             (movingForms s.animation s.field) ++
+                             (if let f = s.field
+                                 in s.animation == Nothing && {up = f,
+                                                               down = f,
+                                                               left = f,
+                                                               right = f} == s.moves
                               then [Graphics.Collage.filled (Color.rgba 0 0 0 0.95)
                                                             (Graphics.Collage.rect sceneSize sceneSize),
                                    (Graphics.Collage.toForm << Text.centered

@@ -23,13 +23,13 @@ addRandomBlock f s =
               s')
 
 nextPosByDir : Direction -> Position -> Position
-nextPosByDir d (i, j) = case d of Up -> (i, j - 1)
-                                  Down -> (i, j + 1)
+nextPosByDir d (i, j) = case d of Up -> (i, j + 1)
+                                  Down -> (i, j - 1)
                                   Left -> (i - 1, j)
                                   Right -> (i + 1, j)
 
 atToWhole : (Direction -> Position -> GameField -> GameField) -> Direction -> GameField -> GameField
-atToWhole fct d f =  List.foldr (if d == Down || d == Right then (<<) else (>>))
+atToWhole fct d f =  List.foldr (if d == Up || d == Right then (<<) else (>>))
                                 identity
                                 (List.map (fct d) (Dict.keys f))
                                 f
@@ -76,3 +76,9 @@ mergeAt d p f = let x = entryAt f p
 
 move : Direction -> GameField -> GameField
 move d f = (shift d << merge d << shift d) f
+
+nextMoves : GameField -> Moves
+nextMoves f = {up = move Up f,
+               down = move Down f,
+               left = move Left f,
+               right = move Right f}

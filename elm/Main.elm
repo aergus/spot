@@ -19,35 +19,38 @@ port initialization : Signal Int
 
 main : Signal.Signal Graphics.Element.Element
 main = Signal.map (\x -> Maybe.withDefault Graphics.Element.empty
-                                          (Maybe.map
-  (\ (f, _, y) -> toScene (f == move Up f && f == move Down f
-                                          && f == move Left f
-                                          && f == move Right f)
-                          y
-                          f)
-  x))
+                                          (Maybe.map toScene x))
                   (Signal.foldp update Nothing signal)
 
-update : Event -> Maybe (GameField, Random.Seed, Maybe Time.Time) -> Maybe (GameField, Random.Seed, Maybe Time.Time)
+update : Event -> Maybe GameState -> Maybe GameState
 update e x = case e of
-  Initialization t -> let f = emptyField dimension
-                          (f', s') = addRandomBlock f (Random.initialSeed t)
-                      in (Just << addThird Nothing) (addRandomBlock f' s')
-  Move d -> Maybe.map (\ (f, s, v) -> if v /= Nothing
-                                      then (f, s ,v)
-                                      else let f' = move d f
-                                           in if f == f'
-                                           then (f, s, Nothing)
-                                           else (f', s, Just 0))
+  Initialization t -> let fd = emptyField dimension
+                          (fd', sd') = addRandomBlock fd (Random.initialSeed t)
+                          (fd'', sd'') = addRandomBlock fd' sd'
+                      in Just {field = fd'',
+                               seed = sd'',
+                               animation = Nothing,
+                               moves = nextMoves fd''}
+  Move d -> Maybe.map (\ s -> if s.animation /= Nothing
+                              then s
+                              else let fd = moveAt s.moves d
+                                   in if s.field == fd
+                                      then s
+                                      else {s | field <- fd,
+                                                animation <- Just 0})
                       x
   Animation t -> Maybe.map
-    (\ (f, s, v) -> Maybe.withDefault (f, s, v)
+    (\ s -> Maybe.withDefault s
       (Maybe.map (\ k -> let k' = k + t
                          in if k' >= animationDuration
-                            then addThird Nothing
-                                          (addRandomBlock (Dict.map (\ p b -> stop b) f) s)
-                            else (f, s, Just k'))
-      v))
+                            then let fd = (Dict.map (\ p b -> stop b) s.field)
+                                     (fd', sd') = addRandomBlock fd s.seed
+                                 in {s | field <- fd',
+                                         seed <- sd',
+                                         animation <- Nothing,
+                                         moves <- nextMoves fd'}
+                            else {s | animation <- Just k'})
+      s.animation))
     x
   _ -> x
 
