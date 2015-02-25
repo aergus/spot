@@ -23,8 +23,8 @@ addRandomBlock f s =
               s')
 
 nextPosByDir : Direction -> Position -> Position
-nextPosByDir d (i, j) = case d of Up -> (i, j - 1)
-                                  Down -> (i, j + 1)
+nextPosByDir d (i, j) = case d of Up -> (i, j + 1)
+                                  Down -> (i, j - 1)
                                   Left -> (i - 1, j)
                                   Right -> (i + 1, j)
 

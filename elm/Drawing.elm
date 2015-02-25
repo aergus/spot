@@ -11,7 +11,6 @@ import Time
 
 import Auxiliary (..)
 import Parameters (..)
-import Transitions (..) -- to be removed
 import Types (..)
 
 blockRect : Graphics.Collage.Shape
@@ -25,13 +24,13 @@ colorOf l = let n = l - 1
             in Color.rgb ((201 * n) % 256) ((223 * n) % 256) 255
 
 toOffset : Int -> Float
-toOffset k = sceneSize / 2 - blockSize / 2 - marginSize - (blockSize + marginSize) * toFloat k
+toOffset k = -(sceneSize / 2 - blockSize / 2 - marginSize - (blockSize + marginSize) * toFloat k)
 
 moveByOffset : (Int, Int) -> Graphics.Collage.Form -> Graphics.Collage.Form
-moveByOffset (i, j) = Graphics.Collage.move (-(toOffset i), toOffset j)
+moveByOffset (i, j) = Graphics.Collage.move (toOffset i, toOffset j)
 
 blockForm : Int -> Graphics.Collage.Form
-blockForm l = (Graphics.Collage.group [Graphics.Collage.filled (colorOf l)
+blockForm l = Graphics.Collage.group [Graphics.Collage.filled (colorOf l)
                                                                 blockRect,
   (Graphics.Collage.toForm << Text.centered
                            << Text.height (blockSize * 0.4)
@@ -39,7 +38,7 @@ blockForm l = (Graphics.Collage.group [Graphics.Collage.filled (colorOf l)
                            << Text.color Color.black
                            << Text.bold
                            << Text.fromString
-                           << toString) (2 ^ l)])
+                           << toString) (2 ^ l)]
 
 stationaryForms : GameField -> List Graphics.Collage.Form
 stationaryForms f = List.map
@@ -54,9 +53,9 @@ movingForms : Maybe Time.Time -> GameField -> List Graphics.Collage.Form
 movingForms x f = Maybe.withDefault [] (Maybe.map
   (\ t -> List.map
     (\ ((i, j), b) ->
-      case b of MovingBlock n (i', j') v -> let x = -(toOffset i)
+      case b of MovingBlock n (i', j') v -> let x = toOffset i
                                                 y = toOffset j
-                                                x' = -(toOffset i')
+                                                x' = toOffset i'
                                                 y' = toOffset j'
                                                 scale = t / animationDuration
                                              in Graphics.Collage.move  (x' + scale * (x - x'),
